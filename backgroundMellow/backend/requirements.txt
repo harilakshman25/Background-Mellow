@@ -20,7 +20,7 @@ torchlibrosa==0.1.0
 
 ### Core ML / scientific stack (aligned to your working env)
 torch==2.4.1
-torchaudio>=2.0.0
+torchaudio==2.4.1
 
 ### Hugging Face / diffusion ecosystem
 transformers==4.46.1

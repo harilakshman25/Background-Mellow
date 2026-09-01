@@ -3,7 +3,7 @@
 
 # Activate conda environment
 source $(conda info --base)/etc/profile.d/conda.sh
-conda activate musicgen
+conda activate bgmellow
 
 # Change to project directory
 cd "$(dirname "$0")"
@@ -11,6 +11,8 @@ cd "$(dirname "$0")"
 
 export PORT="${PORT:-8000}"
 export HOST="${HOST:-0.0.0.0}"
+
+export CUDA_VISIBLE_DEVICES=0
 
 echo "Starting Audio Generation API Server..."
 echo "Using Python: $(which python)"

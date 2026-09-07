@@ -34,6 +34,10 @@ class AudioCueWithAudioBase64:
 class DecideCuesRequest(BaseModel):
     story_text: str = Field(..., description="The story text to analyze")
     speed_wps: Optional[float] = Field(READING_SPEED_WPS, description="Words per second reading speed")
+    genre: Optional[str] = Field(
+        None,
+        description="Optional story genre used to bias the cinematic orchestration (e.g. horror, action, romance, sci-fi, comedy)."
+    )
 class DecideCuesResponse(BaseModel):
     cues: Sequence[Union[AudioCue, NarratorCue]]
     total_duration_ms: int

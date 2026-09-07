@@ -12,7 +12,7 @@ cd "$(dirname "$0")"
 export PORT="${PORT:-8000}"
 export HOST="${HOST:-0.0.0.0}"
 
-export CUDA_VISIBLE_DEVICES=0
+export CUDA_VISIBLE_DEVICES=1
 
 echo "Starting Audio Generation API Server..."
 echo "Using Python: $(which python)"

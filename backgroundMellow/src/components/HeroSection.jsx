@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import AnimatedLoader from "./ui/AnimatedLoader";
 
-const HeroSection = ({ isLoading, onDecompose , storyText, setStoryText, enableNarrator, setEnableNarrator}) => {
+const HeroSection = ({ isLoading, onDecompose , storyText, setStoryText, enableNarrator, setEnableNarrator, genre, setGenre}) => {
 
 
   const handleDecompose = async (e) => {
@@ -19,7 +19,7 @@ const HeroSection = ({ isLoading, onDecompose , storyText, setStoryText, enableN
     }
     
     console.log("Starting decomposition...");
-    await onDecompose?.(storyText);
+    await onDecompose?.(storyText, genre);
   };
 
   const handleTextChange = (e) => {
@@ -86,22 +86,44 @@ const HeroSection = ({ isLoading, onDecompose , storyText, setStoryText, enableN
             />
           </div>
 
-          <div className="mt-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-left">
-            <div className="text-[11px] text-muted-foreground/90">
-              <span className="font-semibold text-foreground">Narrator voice</span>
-              <span className="block">
-                Turn this on if you want an AI narrator reading your story along with the background soundscape.
-              </span>
+          <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
+            <div className="space-y-2 text-left">
+              <label htmlFor="genre-select" className="text-[11px] font-semibold text-foreground tracking-wider uppercase">
+                Genre
+              </label>
+              <select
+                id="genre-select"
+                value={genre}
+                onChange={(e) => setGenre?.(e.target.value || "general")}
+                className="w-full rounded-md border border-border bg-background/70 px-3 py-2 text-sm text-foreground outline-none ring-0 focus:border-primary"
+              >
+                <option value="general">General</option>
+                <option value="horror">Horror</option>
+                <option value="action">Action</option>
+                <option value="romance">Romance</option>
+                <option value="sci-fi">Sci-fi</option>
+                <option value="comedy">Comedy</option>
+                <option value="documentary">Documentary</option>
+              </select>
             </div>
-            <Button
-              type="button"
-              variant={enableNarrator ? "default" : "outline"}
-              size="sm"
-              onClick={handleToggleNarrator}
-              className="px-4 py-2 text-xs font-display tracking-wider"
-            >
-              {enableNarrator ? "Narrator: ON" : "Narrator: OFF"}
-            </Button>
+
+            <div className="text-left md:text-right">
+              <div className="text-[11px] text-muted-foreground/90">
+                <span className="font-semibold text-foreground">Narrator voice</span>
+                <span className="block">
+                  Turn this on if you want an AI narrator reading your story along with the background soundscape.
+                </span>
+              </div>
+              <Button
+                type="button"
+                variant={enableNarrator ? "default" : "outline"}
+                size="sm"
+                onClick={handleToggleNarrator}
+                className="mt-2 px-4 py-2 text-xs font-display tracking-wider"
+              >
+                {enableNarrator ? "Narrator: ON" : "Narrator: OFF"}
+              </Button>
+            </div>
           </div>
 
           {isLoading ? (

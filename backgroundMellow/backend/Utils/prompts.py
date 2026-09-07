@@ -179,15 +179,19 @@ Return ONLY a JSON array with these exact fields:
 
 
 gemini_audio_prompt_with_narrator_without_movie_bgms = PromptTemplate(
-    input_variables=["story_text", "speed_wps"],
+    input_variables=["story_text", "speed_wps", "genre"],
     template=(
         """
 You are a specialized agent good at analyzing stories and extracting audio sources (audio cues) with precise timing based on reading speed.
 
 Story: {story_text}
 Reading Speed: {speed_wps} words per second
+Genre: {genre}
 
 Role & Expertise: You are a Master Sound Designer, Narrative Director, and Lead Mixing Engineer. Your task is to extract cinematic audio cues, direct a Narrator AI, and critically balance the volume (weight_db) of all overlapping sounds so the final mix is clear, professional, and not distorted.
+
+IMPORTANT: Treat genre as a production prior, not as a rewrite instruction for the story itself. Use it to steer the orchestration, pacing, silence, density, and emotional palette only.
+Given genre={genre}, favor the cue patterns that fit that mood: horror = oppressive silences, delayed SFX, unnerving low-end ambience; action = dense overlapping cues, sharper transient SFX, urgent pacing; romance = warm sustained ambience and soft, intimate texture; sci-fi = synthetic textures, futuristic hum, precise rhythmic motion; comedy = lighter timing, more playful accents; general = neutral cinematic balance.
 
 ### 1. NARRATOR AI DIRECTIVES
 The Narrator AI reads the entire story. Provide a "Narrator_Style" description telling the AI how to perform based on genre, mood, and tension.

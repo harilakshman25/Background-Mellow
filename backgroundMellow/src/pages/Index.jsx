@@ -13,6 +13,7 @@ import { Button } from "../components/ui/button";
 
 const Index = () => {
   const [storyText, setStoryText] = useState("");
+  const [genre, setGenre] = useState("general");
   const [audioCues, setAudioCues] = useState([]);
   const [narratorCues, setNarratorCues] = useState([]);
   const [showEvaluation, setShowEvaluation] = useState(false);
@@ -21,7 +22,7 @@ const Index = () => {
   const [missingCues, setMissingCues] = useState([]);
   const [enableNarrator, setEnableNarrator] = useState(true);
   
-  const handleDecompose = async (storyText) => {
+  const handleDecompose = async (storyText, selectedGenre = genre) => {
     // Restore the audio cues
     setAudioCues([]);
     setNarratorCues([]);
@@ -40,7 +41,8 @@ const Index = () => {
         },
         body: JSON.stringify({
           story_text: storyText,
-          speed_wps: 2
+          speed_wps: 2,
+          genre: selectedGenre || "general"
         })
       });
 
@@ -420,7 +422,7 @@ const Index = () => {
           </div>
         </motion.header>
 
-        {/* Hero Section */}
+       {/* Hero Section */}
         <HeroSection
           isLoading={isLoading}
           onDecompose={handleDecompose}
@@ -428,9 +430,9 @@ const Index = () => {
           setStoryText={setStoryText}
           enableNarrator={enableNarrator}
           setEnableNarrator={setEnableNarrator}
+          genre={genre}
+          setGenre={setGenre}
         />
-
-        
 
         {/* Narrator Cues Section */}
         <AnimatePresence>

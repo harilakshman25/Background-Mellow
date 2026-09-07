@@ -366,6 +366,7 @@ def query_gemini(
     speed_wps: float,
     narrator_enabled: bool = True,
     movie_bgms_enabled: bool = True,
+    genre: str | None = None,
 ):
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -373,10 +374,12 @@ def query_gemini(
         return None
     try:
         model_name = model_config.decide_audio_model_name
+        genre_label = (genre or "general").strip() or "general"
         try:
             prompt_value = gemini_audio_prompt_with_narrator_without_movie_bgms.format_prompt(
                 story_text=story_text,
                 speed_wps=speed_wps,
+                genre=genre_label,
             )
             prompt = prompt_value.to_string()
         except Exception as e:
@@ -516,7 +519,13 @@ def local_llm_fallback(story_text: str, speed_wps: float):
         logger.info(f"Fallback extracted {len(gemini_cues)} cues from keyword matching")
     return gemini_cues
 
-def decide_audio_llm(story_text: str, speed_wps: float, narrator_enabled: bool = True, movie_bgms_enabled: bool = True):
+def decide_audio_llm(
+    story_text: str,
+    speed_wps: float,
+    narrator_enabled: bool = True,
+    movie_bgms_enabled: bool = True,
+    genre: str | None = None,
+):
     """
     Uses LLM to decide audio cues with precise timing based on reading speed.
     The LLM provides start_time_ms and duration_ms calculated from word positions.
@@ -527,7 +536,7 @@ def decide_audio_llm(story_text: str, speed_wps: float, narrator_enabled: bool =
     total_duration_ms = math.ceil((len(words) / speed_wps) * 1000)
     
     # Step A: Try Gemini first, then fallback to local LLM
-    gemini_cues = query_gemini(story_text, speed_wps, narrator_enabled, movie_bgms_enabled)
+    gemini_cues = query_gemini(story_text, speed_wps, narrator_enabled, movie_bgms_enabled, genre=genre)
     
     
     if not gemini_cues:
@@ -627,16 +636,23 @@ def decide_audio_llm(story_text: str, speed_wps: float, narrator_enabled: bool =
     logger.info(f"[DECIDER] Successfully generated {len(final_cues)} cinematic cues with LLM-provided timing.")
     return final_cues, total_duration_ms
    
-def decide_audio_cues(story_text: str, speed_wps: float, narrator_enabled: bool = True, movie_bgms_enabled: bool = True):
+def decide_audio_cues(
+    story_text: str,
+    speed_wps: float,
+    narrator_enabled: bool = True,
+    movie_bgms_enabled: bool = True,
+    genre: str | None = None,
+):
     """
     Parses the story text using LLM and creates a timed list of AudioCues.
     Falls back to simple extraction if LLM fails.
     """
     logger.info("Starting audio decision process...")
     logger.info(f"Reading Speed: {speed_wps} words/sec")
+    logger.info(f"Genre: {genre or 'general'}")
     
     try:
-        cues, total_duration = decide_audio_llm(story_text, speed_wps, narrator_enabled, movie_bgms_enabled)
+        cues, total_duration = decide_audio_llm(story_text, speed_wps, narrator_enabled, movie_bgms_enabled, genre=genre)
         if not cues:
             logger.warning("LLM returned no cues, falling back to simple extraction...")
             raise Exception("Failed to generate audio cues with LLM")

@@ -196,7 +196,8 @@ async def decide_audio_cues_handler(request: DecideCuesRequest):
             request.story_text,
             speed_wps,
             narrator_enabled=model_config.use_narrator,
-            movie_bgms_enabled=model_config.use_movie_bgms
+            movie_bgms_enabled=model_config.use_movie_bgms,
+            genre=request.genre,
         )
         return DecideCuesResponse(
             cues=cues,

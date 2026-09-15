@@ -708,6 +708,7 @@ const Index = () => {
               <EvaluationForm
                 audioBase64={finalAudio.audioBase64}
                 storyText={storyText}
+                genre={genre}
               />
             </motion.section>
           )}

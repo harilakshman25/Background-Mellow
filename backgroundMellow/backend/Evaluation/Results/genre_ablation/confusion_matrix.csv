@@ -1,0 +1,6 @@
+requested_genre,horror,action,sci-fi,romance,none
+horror,0.0,1.0,0.0,0.0,0.0
+action,0.0,1.0,0.0,0.0,0.0
+sci-fi,0.0,1.0,0.0,0.0,0.0
+romance,0.0,0.5,0.0,0.0,0.5
+none,0.0,0.5,0.0,0.5,0.0

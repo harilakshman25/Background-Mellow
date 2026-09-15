@@ -1,0 +1,4 @@
+genre,clap_score,spectral_richness,noise_floor_db,audio_onsets,human_final_score,sync_accuracy,semantic_fit,acoustic_quality,narrative_flow,cinematic_impact,metrics_file,audio_file
+general,0.20250120759010315,4.887989521026611,-36.5013542175293,72,5.6,4,2,3,2,3,general-metrics.json,general.wav
+horror,0.2000725120306015,4.686293601989746,-37.07101821899414,98,4.4,3,2,2,2,2,horror-metrics.json,horror.wav
+sci-fi,0.1059408187866211,3.552525281906128,-37.12648010253906,90,6,3,3,3,3,3,sci-fi-metrics.json,sci-fi.wav

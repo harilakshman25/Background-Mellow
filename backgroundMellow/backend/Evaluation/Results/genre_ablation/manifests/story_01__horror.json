@@ -1,0 +1,62 @@
+{
+  "story_id": "story_01",
+  "story": "A person enters a quiet building, walks across a room, and notices a light turning on in the distance.",
+  "requested_genre": "horror",
+  "total_duration_ms": 9500,
+  "cues": [
+    {
+      "id": 0,
+      "audio_type": "NARRATOR",
+      "start_time_ms": 0,
+      "duration_ms": 9500,
+      "story": "A person enters a quiet building, walks across a room, and notices a light turning on in the distance.",
+      "narrator_description": "Gary speaks with a low-pitched, gravelly voice at a deliberate and slow pace. Very clear audio in a quiet environment, emphasizing the silence between words to build dread.",
+      "weight_db": 0
+    },
+    {
+      "id": 1,
+      "audio_type": "AMBIENCE",
+      "start_time_ms": 0,
+      "duration_ms": 9500,
+      "audio_class": "Oppressive low-frequency building room tone with distant metallic hum",
+      "weight_db": -22.0,
+      "fade_ms": 500
+    },
+    {
+      "id": 2,
+      "audio_type": "SFX",
+      "start_time_ms": 1000,
+      "duration_ms": 2500,
+      "audio_class": "Heavy rusted metal door creaking open slowly and thudding shut",
+      "weight_db": -5.0,
+      "fade_ms": 500
+    },
+    {
+      "id": 3,
+      "audio_type": "SFX",
+      "start_time_ms": 3000,
+      "duration_ms": 4000,
+      "audio_class": "Slow, heavy footsteps echoing on hollow wooden floorboards",
+      "weight_db": -8.0,
+      "fade_ms": 500
+    },
+    {
+      "id": 4,
+      "audio_type": "MUSIC",
+      "start_time_ms": 5000,
+      "duration_ms": 4500,
+      "audio_class": "Unnerving horror pad with rising dissonant strings and low-end drone",
+      "weight_db": -16.0,
+      "fade_ms": 500
+    },
+    {
+      "id": 5,
+      "audio_type": "SFX",
+      "start_time_ms": 7000,
+      "duration_ms": 2500,
+      "audio_class": "Sharp electrical light switch click followed by a high-pitched fluorescent buzz",
+      "weight_db": -4.0,
+      "fade_ms": 500
+    }
+  ]
+}

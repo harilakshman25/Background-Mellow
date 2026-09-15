@@ -1,0 +1,26 @@
+story_id,genre,cue_count,audio_type_distribution,mean_weight_db,mean_duration_ms,unique_audio_classes,manifest_path
+story_01,action,1,"{""SFX"": 1}",-6.0,2000.0,"[""footsteps running""]",/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_01__action.json
+story_01,horror,6,"{""AMBIENCE"": 1, ""MUSIC"": 1, ""NARRATOR"": 1, ""SFX"": 3}",-9.166666666666666,5416.666666666667,"[""Heavy rusted metal door creaking open slowly and thudding shut"", ""Oppressive low-frequency building room tone with distant metallic hum"", ""Sharp electrical light switch click followed by a high-pitched fluorescent buzz"", ""Slow, heavy footsteps echoing on hollow wooden floorboards"", ""Unnerving horror pad with rising dissonant strings and low-end drone""]",/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_01__horror.json
+story_01,none,1,"{""SFX"": 1}",-6.0,2000.0,"[""footsteps running""]",/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_01__none.json
+story_01,romance,1,"{""SFX"": 1}",-6.0,2000.0,"[""footsteps running""]",/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_01__romance.json
+story_01,sci-fi,1,"{""SFX"": 1}",-6.0,2000.0,"[""footsteps running""]",/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_01__sci-fi.json
+story_02,action,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_02__action.json
+story_02,horror,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_02__horror.json
+story_02,none,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_02__none.json
+story_02,romance,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_02__romance.json
+story_02,sci-fi,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_02__sci-fi.json
+story_03,action,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_03__action.json
+story_03,horror,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_03__horror.json
+story_03,none,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_03__none.json
+story_03,romance,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_03__romance.json
+story_03,sci-fi,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_03__sci-fi.json
+story_04,action,1,"{""SFX"": 1}",0.0,2000.0,"[""door knocking""]",/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_04__action.json
+story_04,horror,1,"{""SFX"": 1}",0.0,2000.0,"[""door knocking""]",/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_04__horror.json
+story_04,none,1,"{""SFX"": 1}",0.0,2000.0,"[""door knocking""]",/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_04__none.json
+story_04,romance,1,"{""SFX"": 1}",0.0,2000.0,"[""door knocking""]",/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_04__romance.json
+story_04,sci-fi,1,"{""SFX"": 1}",0.0,2000.0,"[""door knocking""]",/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_04__sci-fi.json
+story_05,action,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_05__action.json
+story_05,horror,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_05__horror.json
+story_05,none,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_05__none.json
+story_05,romance,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_05__romance.json
+story_05,sci-fi,0,{},0.0,0.0,[],/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/manifests/story_05__sci-fi.json

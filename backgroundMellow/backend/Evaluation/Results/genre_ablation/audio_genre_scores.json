@@ -1,0 +1,132 @@
+[
+  {
+    "story_id": "story_01",
+    "requested_genre": "action",
+    "predicted_genre": "action",
+    "audio_path": "/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/audio/story_01__action.wav",
+    "scores": {
+      "horror": -0.01744816079735756,
+      "action": 0.02691713161766529,
+      "sci-fi": -0.1449083536863327,
+      "romance": -0.08972238004207611,
+      "none": 0.011056646704673767
+    }
+  },
+  {
+    "story_id": "story_01",
+    "requested_genre": "horror",
+    "predicted_genre": "action",
+    "audio_path": "/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/audio/story_01__horror.wav",
+    "scores": {
+      "horror": -0.1270916610956192,
+      "action": -0.021064501255750656,
+      "sci-fi": -0.09241622686386108,
+      "romance": -0.06820757687091827,
+      "none": -0.08425820618867874
+    }
+  },
+  {
+    "story_id": "story_01",
+    "requested_genre": "none",
+    "predicted_genre": "action",
+    "audio_path": "/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/audio/story_01__none.wav",
+    "scores": {
+      "horror": -0.0923675000667572,
+      "action": 0.10711526870727539,
+      "sci-fi": -0.1669481098651886,
+      "romance": -0.05231350660324097,
+      "none": -0.012578170746564865
+    }
+  },
+  {
+    "story_id": "story_01",
+    "requested_genre": "romance",
+    "predicted_genre": "action",
+    "audio_path": "/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/audio/story_01__romance.wav",
+    "scores": {
+      "horror": -0.061682164669036865,
+      "action": -0.02789311856031418,
+      "sci-fi": -0.19359272718429565,
+      "romance": -0.04789528623223305,
+      "none": -0.04983675479888916
+    }
+  },
+  {
+    "story_id": "story_01",
+    "requested_genre": "sci-fi",
+    "predicted_genre": "action",
+    "audio_path": "/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/audio/story_01__sci-fi.wav",
+    "scores": {
+      "horror": -0.07108183205127716,
+      "action": 0.05339019000530243,
+      "sci-fi": -0.1564481109380722,
+      "romance": -0.13182130455970764,
+      "none": -0.09626893699169159
+    }
+  },
+  {
+    "story_id": "story_04",
+    "requested_genre": "action",
+    "predicted_genre": "action",
+    "audio_path": "/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/audio/story_04__action.wav",
+    "scores": {
+      "horror": -0.17762437462806702,
+      "action": -0.04620981961488724,
+      "sci-fi": -0.2354438751935959,
+      "romance": -0.06668618321418762,
+      "none": -0.073350690305233
+    }
+  },
+  {
+    "story_id": "story_04",
+    "requested_genre": "horror",
+    "predicted_genre": "action",
+    "audio_path": "/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/audio/story_04__horror.wav",
+    "scores": {
+      "horror": -0.15116086602210999,
+      "action": 0.031109202653169632,
+      "sci-fi": -0.1531703919172287,
+      "romance": -0.07881258428096771,
+      "none": 0.010305307805538177
+    }
+  },
+  {
+    "story_id": "story_04",
+    "requested_genre": "none",
+    "predicted_genre": "romance",
+    "audio_path": "/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/audio/story_04__none.wav",
+    "scores": {
+      "horror": -0.13295778632164001,
+      "action": -0.10736636817455292,
+      "sci-fi": -0.197706937789917,
+      "romance": -0.1043330579996109,
+      "none": -0.13456669449806213
+    }
+  },
+  {
+    "story_id": "story_04",
+    "requested_genre": "romance",
+    "predicted_genre": "none",
+    "audio_path": "/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/audio/story_04__romance.wav",
+    "scores": {
+      "horror": -0.14377450942993164,
+      "action": -0.04333266243338585,
+      "sci-fi": -0.19370466470718384,
+      "romance": -0.07055740803480148,
+      "none": -0.008878178894519806
+    }
+  },
+  {
+    "story_id": "story_04",
+    "requested_genre": "sci-fi",
+    "predicted_genre": "action",
+    "audio_path": "/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend/Evaluation/Results/genre_ablation/audio/story_04__sci-fi.wav",
+    "scores": {
+      "horror": -0.16902367770671844,
+      "action": -0.007943467237055302,
+      "sci-fi": -0.2186809480190277,
+      "romance": -0.057162754237651825,
+      "none": -0.087607741355896
+    }
+  }
+]

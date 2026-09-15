@@ -1,0 +1,2 @@
+python backgroundMellow/backend/Evaluation/manual_queries/compare_metrics.py \
+  backgroundMellow/backend/Evaluation/manual_queries/corridor_scene

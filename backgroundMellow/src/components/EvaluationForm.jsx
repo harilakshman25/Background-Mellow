@@ -31,7 +31,7 @@ const automatedMetricsConfig = {
 };
 
 
-const EvaluationForm = memo(({ audioBase64, storyText }) => {
+const EvaluationForm = memo(({ audioBase64, storyText, genre = "general" }) => {
   const [step, setStep] = useState("form");
   const [personName, setPersonName] = useState("");
   const [humanScores, setHumanScores] = useState({
@@ -268,6 +268,26 @@ const EvaluationForm = memo(({ audioBase64, storyText }) => {
     }
   }, [personName, humanScores, feedback, audioBase64, storyText, calculateFinalScore]);
 
+  const handleDownloadMetrics = useCallback(() => {
+    const metricsRecord = {
+      storyPrompt: storyText || "N/A",
+      genre,
+      automatedMetrics: autoMetrics,
+      humanScores,
+      finalScore: Number(calculateFinalScore().toFixed(1)),
+      feedback: feedback || "",
+      createdAt: new Date().toISOString(),
+    };
+    const blob = new Blob([JSON.stringify(metricsRecord, null, 2)], {
+      type: "application/json",
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${genre || "general"}-metrics.json`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }, [storyText, genre, autoMetrics, humanScores, feedback, calculateFinalScore]);
+
 
 
 
@@ -496,6 +516,14 @@ const EvaluationForm = memo(({ audioBase64, storyText }) => {
             disabled={isSaving}
           >
             Re-evaluate
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadMetrics}
+            disabled={isSaving}
+          >
+            Download Metrics
           </Button>
           <Button 
             size="sm" 

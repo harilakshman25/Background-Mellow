@@ -13,6 +13,7 @@
 import logging
 import json
 import re
+import time
 import warnings
 
 from numpy import True_
@@ -42,6 +43,8 @@ load_dotenv(os.path.join(backend_dir, ".env"))
 logger = logging.getLogger(__name__)
 GEMINI_AVAILABLE = True
 USE_NEW_GENAI = True
+GEMINI_QUERY_RETRIES = 3
+GEMINI_RETRY_BACKOFF_SECONDS = 1.0
 
 
 def _classify_audio_type(word: str, pos_tag: str, context: str = "") -> Tuple[str | None, str | None]:
@@ -386,20 +389,39 @@ def query_gemini(
             logger.error(f"Error formatting base audio prompt: {e}", exc_info=True)
             return None
 
-        base_response = None
-        try:
-            base_response = query_llm(
-                llm_name="gemini", model_name=model_name, prompt=prompt
+        audio_cues: List[Dict] = []
+        for attempt in range(1, GEMINI_QUERY_RETRIES + 1):
+            try:
+                base_response = query_llm(
+                    llm_name="gemini", model_name=model_name, prompt=prompt
+                )
+                if base_response:
+                    audio_cues = _parse_gemini_cues(base_response)
+                if audio_cues:
+                    break
+                logger.warning(
+                    "Gemini base audio prompt returned no parseable cues "
+                    "(attempt %d/%d)",
+                    attempt,
+                    GEMINI_QUERY_RETRIES,
+                )
+            except Exception as e:
+                logger.warning(
+                    "Model %s failed on base cues (attempt %d/%d): %s",
+                    model_name,
+                    attempt,
+                    GEMINI_QUERY_RETRIES,
+                    e,
+                )
+            if attempt < GEMINI_QUERY_RETRIES:
+                time.sleep(GEMINI_RETRY_BACKOFF_SECONDS * (2 ** (attempt - 1)))
+
+        if not audio_cues:
+            logger.error(
+                "Gemini base audio prompt failed after %d attempts",
+                GEMINI_QUERY_RETRIES,
             )
-        except Exception as e:
-            logger.error(f"\n\nModel {model_name} failed on base cues: {e}\n\n")
             return None
-
-        if not base_response:
-            logger.error("Gemini base audio prompt returned empty response")
-            return None
-
-        audio_cues: List[Dict] = _parse_gemini_cues(base_response)
 
         # -------- Stage 2: Optional movie BGMs, conditioned on existing cues --------
         if movie_bgms_enabled:

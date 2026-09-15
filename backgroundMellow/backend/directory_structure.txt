@@ -1,0 +1,480 @@
+Directory structure for:
+/home/bt3/23CS10009/BackgroundMellow_ismir/backgroundMellow/backend
+
+backend/
+    ├── data/
+    │   ├── clips/
+    │   │   ├── EBNl8bwdVcA_0001.mp4
+    │   │   ├── EBNl8bwdVcA_0003.mp4
+    │   │   ├── EBNl8bwdVcA_0006.mp4
+    │   │   ├── EBNl8bwdVcA_0013.mp4
+    │   │   ├── EBNl8bwdVcA_0014.mp4
+    │   │   ├── EBNl8bwdVcA_0016.mp4
+    │   │   ├── EBNl8bwdVcA_0017.mp4
+    │   │   ├── EBNl8bwdVcA_0018.mp4
+    │   │   ├── EBNl8bwdVcA_0019.mp4
+    │   │   ├── EBNl8bwdVcA_0022.mp4
+    │   │   ├── EBNl8bwdVcA_0023.mp4
+    │   │   ├── EBNl8bwdVcA_0024.mp4
+    │   │   ├── EOshNPwuoUg_0002.mp4
+    │   │   ├── EOshNPwuoUg_0003.mp4
+    │   │   ├── EOshNPwuoUg_0004.mp4
+    │   │   ├── EOshNPwuoUg_0007.mp4
+    │   │   ├── EOshNPwuoUg_0009.mp4
+    │   │   ├── EOshNPwuoUg_0010.mp4
+    │   │   ├── EOshNPwuoUg_0011.mp4
+    │   │   ├── EOshNPwuoUg_0016.mp4
+    │   │   └── [Only 20 files written; 113 more files omitted]
+    │   ├── elevenlabs/
+    │   │   ├── voice_embeddings.npy
+    │   │   ├── voice_index.json
+    │   │   ├── voices.json
+    │   ├── embeddings/
+    │   │   ├── audio/
+    │   │   │   ├── 1RMEGiTKokk_0023_audio.npy
+    │   │   │   ├── 1RMEGiTKokk_0038_audio.npy
+    │   │   │   ├── 3I1mwmFsrGU_0001_audio.npy
+    │   │   │   ├── 3I1mwmFsrGU_0002_audio.npy
+    │   │   │   ├── 3I1mwmFsrGU_0005_audio.npy
+    │   │   │   ├── 3I1mwmFsrGU_0007_audio.npy
+    │   │   │   ├── 3I1mwmFsrGU_0009_audio.npy
+    │   │   │   ├── 3I1mwmFsrGU_0013_audio.npy
+    │   │   │   ├── 3I1mwmFsrGU_0015_audio.npy
+    │   │   │   ├── 3I1mwmFsrGU_0016_audio.npy
+    │   │   │   ├── 3I1mwmFsrGU_0017_audio.npy
+    │   │   │   ├── 8WdMVNPRshg_0004_audio.npy
+    │   │   │   ├── 8WdMVNPRshg_0005_audio.npy
+    │   │   │   ├── 8WdMVNPRshg_0006_audio.npy
+    │   │   │   ├── 8WdMVNPRshg_0008_audio.npy
+    │   │   │   ├── 8WdMVNPRshg_0009_audio.npy
+    │   │   │   ├── 8WdMVNPRshg_0010_audio.npy
+    │   │   │   ├── 8WdMVNPRshg_0012_audio.npy
+    │   │   │   ├── d7yFV5G9we8_0014_audio.npy
+    │   │   │   ├── d7yFV5G9we8_0028_audio.npy
+    │   │   │   └── [Only 20 files written; 191 more files omitted]
+    │   │   ├── combined/
+    │   │   │   ├── 1RMEGiTKokk_0023_combined.npy
+    │   │   │   ├── 1RMEGiTKokk_0038_combined.npy
+    │   │   │   ├── 3I1mwmFsrGU_0001_combined.npy
+    │   │   │   ├── 3I1mwmFsrGU_0002_combined.npy
+    │   │   │   ├── 3I1mwmFsrGU_0005_combined.npy
+    │   │   │   ├── 3I1mwmFsrGU_0007_combined.npy
+    │   │   │   ├── 3I1mwmFsrGU_0009_combined.npy
+    │   │   │   ├── 3I1mwmFsrGU_0013_combined.npy
+    │   │   │   ├── 3I1mwmFsrGU_0015_combined.npy
+    │   │   │   ├── 3I1mwmFsrGU_0016_combined.npy
+    │   │   │   ├── 3I1mwmFsrGU_0017_combined.npy
+    │   │   │   ├── 8WdMVNPRshg_0004_combined.npy
+    │   │   │   ├── 8WdMVNPRshg_0005_combined.npy
+    │   │   │   ├── 8WdMVNPRshg_0006_combined.npy
+    │   │   │   ├── 8WdMVNPRshg_0008_combined.npy
+    │   │   │   ├── 8WdMVNPRshg_0009_combined.npy
+    │   │   │   ├── 8WdMVNPRshg_0010_combined.npy
+    │   │   │   ├── 8WdMVNPRshg_0012_combined.npy
+    │   │   │   ├── d7yFV5G9we8_0014_combined.npy
+    │   │   │   ├── d7yFV5G9we8_0028_combined.npy
+    │   │   │   └── [Only 20 files written; 191 more files omitted]
+    │   │   ├── env_embeddings/
+    │   │   ├── music_embeddings/
+    │   │   ├── retrieval/
+    │   │   │   ├── 1RMEGiTKokk_0023_retrieval.npy
+    │   │   │   ├── 1RMEGiTKokk_0038_retrieval.npy
+    │   │   │   ├── 3I1mwmFsrGU_0001_retrieval.npy
+    │   │   │   ├── 3I1mwmFsrGU_0002_retrieval.npy
+    │   │   │   ├── 3I1mwmFsrGU_0005_retrieval.npy
+    │   │   │   ├── 3I1mwmFsrGU_0007_retrieval.npy
+    │   │   │   ├── 3I1mwmFsrGU_0009_retrieval.npy
+    │   │   │   ├── 3I1mwmFsrGU_0013_retrieval.npy
+    │   │   │   ├── 3I1mwmFsrGU_0015_retrieval.npy
+    │   │   │   ├── 3I1mwmFsrGU_0016_retrieval.npy
+    │   │   │   ├── 3I1mwmFsrGU_0017_retrieval.npy
+    │   │   │   ├── 8WdMVNPRshg_0004_retrieval.npy
+    │   │   │   ├── 8WdMVNPRshg_0005_retrieval.npy
+    │   │   │   ├── 8WdMVNPRshg_0006_retrieval.npy
+    │   │   │   ├── 8WdMVNPRshg_0008_retrieval.npy
+    │   │   │   ├── 8WdMVNPRshg_0009_retrieval.npy
+    │   │   │   ├── 8WdMVNPRshg_0010_retrieval.npy
+    │   │   │   ├── 8WdMVNPRshg_0012_retrieval.npy
+    │   │   │   ├── d7yFV5G9we8_0014_retrieval.npy
+    │   │   │   ├── d7yFV5G9we8_0028_retrieval.npy
+    │   │   │   └── [Only 20 files written; 189 more files omitted]
+    │   │   ├── sfx_embeddings/
+    │   │   ├── .DS_Store
+    │   ├── faiss/
+    │   │   ├── env/
+    │   │   ├── music/
+    │   │   ├── sfx/
+    │   │   ├── bgm.index
+    │   │   ├── metadata.jsonl
+    │   ├── metadata/
+    │   │   ├── env_metadata.csv
+    │   │   ├── metadata.csv
+    │   │   ├── metadata.json
+    │   │   ├── movie_bgms.csv
+    │   │   ├── music_metadata.csv
+    │   │   ├── sfx_metadata.csv
+    │   │   ├── youtube_video_links.csv
+    │   ├── movie_bgms/
+    │   │   ├── 1RMEGiTKokk_0023.wav
+    │   │   ├── 1RMEGiTKokk_0038.wav
+    │   │   ├── 3I1mwmFsrGU_0001.wav
+    │   │   ├── 3I1mwmFsrGU_0002.wav
+    │   │   ├── 3I1mwmFsrGU_0005.wav
+    │   │   ├── 3I1mwmFsrGU_0007.wav
+    │   │   ├── 3I1mwmFsrGU_0009.wav
+    │   │   ├── 3I1mwmFsrGU_0013.wav
+    │   │   ├── 3I1mwmFsrGU_0015.wav
+    │   │   ├── 3I1mwmFsrGU_0016.wav
+    │   │   ├── 3I1mwmFsrGU_0017.wav
+    │   │   ├── 3oB9AxspVow_0065.wav
+    │   │   ├── 3oB9AxspVow_0072.wav
+    │   │   ├── 5YEVQDr2f3Q_0023.wav
+    │   │   ├── 5YEVQDr2f3Q_0036.wav
+    │   │   ├── 5YEVQDr2f3Q_0099.wav
+    │   │   ├── 5YEVQDr2f3Q_0107.wav
+    │   │   ├── 7p1oRZlVnYU_0002.wav
+    │   │   ├── 7p1oRZlVnYU_0013.wav
+    │   │   ├── 7p1oRZlVnYU_0034.wav
+    │   │   └── [Only 20 files written; 274 more files omitted]
+    │   ├── music/
+    │   ├── raw_videos/
+    │   │   ├── env_raw_clips/
+    │   │   ├── movie_raw_clips/
+    │   │   │   ├── EBNl8bwdVcA.mp4
+    │   │   │   ├── EOshNPwuoUg.mp4
+    │   │   │   ├── j0KhH04xMlE.mp4
+    │   │   │   ├── JFDFFoBClLY.mp4
+    │   │   │   ├── PG2_YPghct4.mp4
+    │   │   │   ├── PrIM-FvPZN4.mp4
+    │   │   │   ├── qi2rByJed-E.mp4
+    │   │   │   ├── wvaAh_j-N0g.mp4
+    │   │   │   ├── Y2LteBdfkeg.mp4
+    │   │   │   ├── ZNwBVa96kmM.mp4
+    │   │   ├── music_raw_clips/
+    │   │   ├── sfx_raw_clips/
+    │   │   ├── .DS_Store
+    │   ├── retrive/
+    │   │   ├── env_audios/
+    │   │   ├── music_audios/
+    │   │   ├── sfx_audios/
+    │   ├── scene_metadata/
+    │   │   ├── 1RMEGiTKokk_0023.json
+    │   │   ├── 1RMEGiTKokk_0038.json
+    │   │   ├── 1RMEGiTKokk_0041.json
+    │   │   ├── 1yMCW2RzJUo_0079.json
+    │   │   ├── 3I1mwmFsrGU_0001.json
+    │   │   ├── 3I1mwmFsrGU_0002.json
+    │   │   ├── 3I1mwmFsrGU_0005.json
+    │   │   ├── 3I1mwmFsrGU_0007.json
+    │   │   ├── 3I1mwmFsrGU_0009.json
+    │   │   ├── 3I1mwmFsrGU_0013.json
+    │   │   ├── 3I1mwmFsrGU_0015.json
+    │   │   ├── 3I1mwmFsrGU_0016.json
+    │   │   ├── 3I1mwmFsrGU_0017.json
+    │   │   ├── 3I1mwmFsrGU_0018.json
+    │   │   ├── 3oB9AxspVow_0065.json
+    │   │   ├── 3oB9AxspVow_0072.json
+    │   │   ├── 5YEVQDr2f3Q_0023.json
+    │   │   ├── 5YEVQDr2f3Q_0036.json
+    │   │   ├── 5YEVQDr2f3Q_0099.json
+    │   │   ├── 5YEVQDr2f3Q_0107.json
+    │   │   └── [Only 20 files written; 342 more files omitted]
+    │   ├── user_uploaded_audios/
+    │   │   ├── audio/
+    │   │   │   ├── .gitkeep
+    │   │   ├── metadata.csv
+    │   ├── yt_videos/
+    │   │   ├── Debug/
+    │   │   │   ├── better_dataset.jsonl
+    │   │   │   ├── yt_dataset.jsonl
+    │   │   │   ├── yt_dataset_more_better.jsonl
+    │   │   │   ├── yt_video_dataset_prepare.py
+    │   │   ├── class_labels_indices.csv
+    │   │   ├── generated_train_dataset.pkl
+    │   │   ├── yt_dataset.jsonl
+    │   │   ├── yt_prepare_test_dataset.py
+    │   │   ├── yt_random_test_dataset.jsonl
+    │   │   ├── yt_test_dataset_1.jsonl
+    │   │   ├── yt_test_dataset_2.jsonl
+    │   │   ├── yt_test_dataset_3.jsonl
+    │   │   ├── yt_test_dataset_4.jsonl
+    │   │   ├── yt_test_dataset_5.jsonl
+    │   │   ├── yt_test_dataset_6.jsonl
+    │   │   ├── yt_test_dataset.jsonl
+    │   │   ├── yt_unseen_test_dataset.jsonl
+    │   │   ├── yt_video_dataset_prepare.py
+    │   ├── downloaded.json
+    │   ├── .DS_Store
+    │   ├── hitl_edits.jsonl
+    │   ├── loss_curve.png
+    │   ├── Movie-Link.csv
+    ├── Evaluation/
+    │   ├── manual_queries/
+    │   │   ├── corridor_scene/
+    │   │   │   ├── commands.txt
+    │   │   │   ├── comparison.csv
+    │   │   │   ├── general-metrics.json
+    │   │   │   ├── general.wav
+    │   │   │   ├── horror-metrics.json
+    │   │   │   ├── horror.wav
+    │   │   │   ├── sci-fi-metrics.json
+    │   │   │   ├── sci-fi.wav
+    │   │   ├── compare_metrics.py
+    │   ├── Results/
+    │   │   ├── genre_ablation/
+    │   │   │   ├── audio/
+    │   │   │   │   ├── story_01__action.wav
+    │   │   │   │   ├── story_01__horror.wav
+    │   │   │   │   ├── story_01__none.wav
+    │   │   │   │   ├── story_01__romance.wav
+    │   │   │   │   ├── story_01__sci-fi.wav
+    │   │   │   │   ├── story_02__action.wav
+    │   │   │   │   ├── story_02__horror.wav
+    │   │   │   │   ├── story_02__none.wav
+    │   │   │   │   ├── story_02__romance.wav
+    │   │   │   │   ├── story_02__sci-fi.wav
+    │   │   │   │   ├── story_03__action.wav
+    │   │   │   │   ├── story_03__horror.wav
+    │   │   │   │   ├── story_03__none.wav
+    │   │   │   │   ├── story_03__romance.wav
+    │   │   │   │   ├── story_03__sci-fi.wav
+    │   │   │   │   ├── story_04__action.wav
+    │   │   │   │   ├── story_04__horror.wav
+    │   │   │   │   ├── story_04__none.wav
+    │   │   │   │   ├── story_04__romance.wav
+    │   │   │   │   ├── story_04__sci-fi.wav
+    │   │   │   │   └── [Only 20 files written; 5 more files omitted]
+    │   │   │   ├── manifests/
+    │   │   │   │   ├── story_01__action.json
+    │   │   │   │   ├── story_01__horror.json
+    │   │   │   │   ├── story_01__none.json
+    │   │   │   │   ├── story_01__romance.json
+    │   │   │   │   ├── story_01__sci-fi.json
+    │   │   │   │   ├── story_02__action.json
+    │   │   │   │   ├── story_02__horror.json
+    │   │   │   │   ├── story_02__none.json
+    │   │   │   │   ├── story_02__romance.json
+    │   │   │   │   ├── story_02__sci-fi.json
+    │   │   │   │   ├── story_03__action.json
+    │   │   │   │   ├── story_03__horror.json
+    │   │   │   │   ├── story_03__none.json
+    │   │   │   │   ├── story_03__romance.json
+    │   │   │   │   ├── story_03__sci-fi.json
+    │   │   │   │   ├── story_04__action.json
+    │   │   │   │   ├── story_04__horror.json
+    │   │   │   │   ├── story_04__none.json
+    │   │   │   │   ├── story_04__romance.json
+    │   │   │   │   ├── story_04__sci-fi.json
+    │   │   │   │   └── [Only 20 files written; 5 more files omitted]
+    │   │   │   ├── audio_genre_scores.json
+    │   │   │   ├── confusion_matrix.csv
+    │   │   │   ├── confusion_matrix.png
+    │   │   │   ├── manifest_stats.csv
+    │   │   ├── infernce_results/
+    │   │   │   ├── yt_random_test_dataset_inference_results.csv
+    │   │   ├── plots/
+    │   │   │   ├── audio_richness_spectral_flatness/
+    │   │   │   │   ├── ablation_matrix_audio_richness_spectral_flatness.csv
+    │   │   │   │   ├── ablation_report_audio_richness_spectral_flatness.txt
+    │   │   │   │   ├── ablations_best_audio_richness_spectral_flatness.png
+    │   │   │   │   ├── ablations_heatmap_audio_richness_spectral_flatness.png
+    │   │   │   │   ├── ablations_margin_vs_baseline_audio_richness_spectral_flatness.png
+    │   │   │   │   ├── ablations_mean_audio_richness_spectral_flatness.png
+    │   │   │   │   ├── ablations_win_rate_audio_richness_spectral_flatness.png
+    │   │   │   │   ├── mean_ranks_audio_richness_spectral_flatness.csv
+    │   │   │   │   ├── per_prompt_audio_richness_spectral_flatness_baseline.png
+    │   │   │   │   ├── win_summary_audio_richness_spectral_flatness.csv
+    │   │   │   ├── cinematic_dynamic_range_db/
+    │   │   │   │   ├── ablation_matrix_cinematic_dynamic_range_db.csv
+    │   │   │   │   ├── ablation_report_cinematic_dynamic_range_db.txt
+    │   │   │   │   ├── ablations_best_cinematic_dynamic_range_db.png
+    │   │   │   │   ├── ablations_heatmap_cinematic_dynamic_range_db.png
+    │   │   │   │   ├── ablations_margin_vs_baseline_cinematic_dynamic_range_db.png
+    │   │   │   │   ├── ablations_mean_cinematic_dynamic_range_db.png
+    │   │   │   │   ├── ablations_win_rate_cinematic_dynamic_range_db.png
+    │   │   │   │   ├── mean_ranks_cinematic_dynamic_range_db.csv
+    │   │   │   │   ├── per_prompt_cinematic_dynamic_range_db_BackgroundMellow_baseline.png
+    │   │   │   │   ├── per_prompt_cinematic_dynamic_range_db_baseline.png
+    │   │   │   │   ├── win_summary_cinematic_dynamic_range_db.csv
+    │   │   │   ├── clap_score/
+    │   │   │   │   ├── ablation_matrix_clap_score.csv
+    │   │   │   │   ├── ablation_report_clap_score.txt
+    │   │   │   │   ├── ablations_best_clap_score.png
+    │   │   │   │   ├── ablations_heatmap_clap_score.png
+    │   │   │   │   ├── ablations_margin_vs_baseline_clap_score.png
+    │   │   │   │   ├── ablations_mean_clap_score.png
+    │   │   │   │   ├── ablations_win_rate_clap_score.png
+    │   │   │   │   ├── mean_ranks_clap_score.csv
+    │   │   │   │   ├── per_prompt_clap_score_BackgroundMellow_baseline.png
+    │   │   │   │   ├── per_prompt_clap_score_baseline.png
+    │   │   │   │   ├── win_summary_clap_score.csv
+    │   │   │   ├── yt_coverage_score/
+    │   │   │   │   ├── ablation_matrix_yt_coverage_score.csv
+    │   │   │   │   ├── ablation_report_yt_coverage_score.txt
+    │   │   │   │   ├── ablations_best_yt_coverage_score.png
+    │   │   │   │   ├── ablations_heatmap_yt_coverage_score.png
+    │   │   │   │   ├── ablations_mean_yt_coverage_score.png
+    │   │   │   │   ├── ablations_win_rate_yt_coverage_score.png
+    │   │   │   │   ├── mean_ranks_yt_coverage_score.csv
+    │   │   │   │   ├── per_prompt_yt_coverage_score_BackgroundMellow_baseline.png
+    │   │   │   │   ├── per_prompt_yt_coverage_score_baseline.png
+    │   │   │   │   ├── win_summary_yt_coverage_score.csv
+    │   │   │   ├── yt_sync_score/
+    │   │   │   │   ├── ablation_matrix_yt_sync_score.csv
+    │   │   │   │   ├── ablation_report_yt_sync_score.txt
+    │   │   │   │   ├── ablations_best_yt_sync_score.png
+    │   │   │   │   ├── ablations_heatmap_yt_sync_score.png
+    │   │   │   │   ├── ablations_mean_yt_sync_score.png
+    │   │   │   │   ├── ablations_win_rate_yt_sync_score.png
+    │   │   │   │   ├── mean_ranks_yt_sync_score.csv
+    │   │   │   │   ├── per_prompt_yt_sync_score_BackgroundMellow_baseline.png
+    │   │   │   │   ├── per_prompt_yt_sync_score_baseline.png
+    │   │   │   │   ├── win_summary_yt_sync_score.csv
+    │   │   │   ├── ablation_metrics_from_csv.png
+    │   │   │   ├── ablation_metrics_overlay.png
+    │   │   │   ├── results_ablations.png
+    │   │   │   ├── tango_vs_audioldm_overlay.png
+    │   │   ├── Results_from_server/
+    │   │   │   ├── audioldm2_results_yt_per_prompt/
+    │   │   │   │   ├── row_00000_prompt_4535861219.json
+    │   │   │   │   ├── row_00001_prompt_329122f405.json
+    │   │   │   │   ├── row_00002_prompt_0ad637f9b1.json
+    │   │   │   │   ├── row_00003_prompt_9f0179aa20.json
+    │   │   │   │   ├── row_00004_prompt_0b92f63df3.json
+    │   │   │   │   ├── row_00005_prompt_47523e0b68.json
+    │   │   │   │   ├── row_00006_prompt_b4831736f6.json
+    │   │   │   │   ├── row_00007_prompt_595a01abf9.json
+    │   │   │   │   ├── row_00008_prompt_8acd94a91b.json
+    │   │   │   │   ├── row_00009_prompt_cf2fd90480.json
+    │   │   │   │   ├── row_00010_prompt_6be5f1de4d.json
+    │   │   │   │   ├── row_00011_prompt_ef0404baa7.json
+    │   │   │   │   ├── row_00012_prompt_1d4dec4a9b.json
+    │   │   │   │   ├── row_00013_prompt_013da81d0e.json
+    │   │   │   │   ├── row_00014_prompt_226cd7abdd.json
+    │   │   │   │   ├── row_00015_prompt_6fdc705994.json
+    │   │   │   │   ├── row_00016_prompt_f99b0d1c5c.json
+    │   │   │   │   ├── row_00017_prompt_09c8867f9e.json
+    │   │   │   │   ├── row_00018_prompt_2adb0f7f3c.json
+    │   │   │   │   ├── row_00019_prompt_8e663ae4c7.json
+    │   │   │   │   └── [Only 20 files written; 19 more files omitted]
+    │   │   │   ├── Results/
+    │   │   │   │   ├── debug/
+    │   │   │   │   │   ├── yt_inference_2.csv
+    │   │   │   │   ├── infernce_results/
+    │   │   │   │   │   ├── yt_random_test_dataset_inference_results.csv
+    │   │   │   │   ├── yt_inference_2.csv
+    │   │   │   │   ├── yt_inference_3.csv
+    │   │   │   │   ├── yt_inference_4.csv
+    │   │   │   │   ├── yt_inference_5.csv
+    │   │   │   │   ├── yt_inference_6.csv
+    │   │   │   ├── tango2_results_yt_per_prompt/
+    │   │   │   │   ├── row_00000_prompt_4535861219.json
+    │   │   │   │   ├── row_00001_prompt_329122f405.json
+    │   │   │   │   ├── row_00002_prompt_0ad637f9b1.json
+    │   │   │   │   ├── row_00003_prompt_9f0179aa20.json
+    │   │   │   │   ├── row_00004_prompt_0b92f63df3.json
+    │   │   │   │   ├── row_00005_prompt_47523e0b68.json
+    │   │   │   │   ├── row_00006_prompt_b4831736f6.json
+    │   │   │   │   ├── row_00007_prompt_595a01abf9.json
+    │   │   │   │   ├── row_00008_prompt_8acd94a91b.json
+    │   │   │   │   ├── row_00009_prompt_cf2fd90480.json
+    │   │   │   │   ├── row_00010_prompt_6be5f1de4d.json
+    │   │   │   │   ├── row_00011_prompt_ef0404baa7.json
+    │   │   │   │   ├── row_00012_prompt_1d4dec4a9b.json
+    │   │   │   │   ├── row_00013_prompt_013da81d0e.json
+    │   │   │   │   ├── row_00014_prompt_226cd7abdd.json
+    │   │   │   │   ├── row_00015_prompt_6fdc705994.json
+    │   │   │   │   ├── row_00016_prompt_f99b0d1c5c.json
+    │   │   │   │   ├── row_00017_prompt_09c8867f9e.json
+    │   │   │   │   ├── row_00018_prompt_2adb0f7f3c.json
+    │   │   │   │   ├── row_00019_prompt_8e663ae4c7.json
+    │   │   │   │   └── [Only 20 files written; 19 more files omitted]
+    │   │   │   ├── audioldm2_results.csv
+    │   │   │   ├── final_results.csv
+    │   │   │   ├── tango2_results.csv
+    │   │   ├── audioldm2_results.csv
+    │   │   ├── final_ablations_results.csv
+    │   │   ├── final_ablations_results_scaled.csv
+    │   │   ├── final_results.csv
+    │   │   ├── Model Evaluation - final_results.csv
+    │   │   ├── results_summary.txt
+    │   │   ├── tango2_results.csv
+    │   │   ├── yt_inference_1.csv
+    │   │   ├── yt_inference_1_initial.csv
+    │   ├── baseline_models_evaluation.py
+    │   ├── clap.py
+    │   ├── evaluation.py
+    │   ├── evaluation_runner.py
+    │   ├── evaluator.py
+    │   ├── generated_score.mp3
+    │   ├── genre_ablation_eval.py
+    │   ├── kl_divergence.py
+    │   ├── mix_results.ipynb
+    │   ├── tango_and_audioldm_yt_scores.py
+    │   ├── visualize_results.ipynb
+    │   ├── visualize_results.py
+    │   ├── yt_inference_1.csv
+    │   ├── yt_inference_6.csv
+    │   ├── yt_infernce_1.csv
+    ├── headers/
+    │   ├── imports.py
+    ├── helper/
+    │   ├── model/
+    │   │   ├── dl_based_alignment_predictor.pth
+    │   ├── audio_conversions.py
+    │   ├── audio_processing.py
+    │   ├── dl_conversions.py
+    │   ├── dl_predictor_helpers.py
+    │   ├── lib.py
+    │   ├── loss_curve.png
+    │   ├── parallel_audio_generation.py
+    │   ├── yt_dataset.jsonl
+    ├── model/
+    │   ├── model/
+    │   │   ├── dl_based_alignment_predictor.pth
+    │   ├── audioLDM_model.py
+    │   ├── base_sound_model.py
+    │   ├── dl_based_alignment_predictor.py
+    │   ├── elevenlabs_model.py
+    │   ├── llm_dsp_weight_predictor.pth
+    │   ├── loss_curve.png
+    │   ├── parlerTTSModel.py
+    │   ├── tango2_model.py
+    │   ├── tangoflux_model.py
+    │   ├── word_aligner.py
+    ├── specialist_model/
+    │   ├── emotional_generator.py
+    │   ├── env_generator.py
+    │   ├── movie_bgm_retriver.py
+    │   ├── sfx_generator.py
+    │   ├── sfx.ipynb
+    │   ├── text_to_speech_generator.py
+    ├── superimposition_model/
+    │   ├── align_predictor.py
+    │   ├── llm_dsp_weight_predictor.py
+    │   ├── superimposition_model.py
+    ├── tango_new/ [not expanded]
+    ├── Tools/
+    │   ├── decide_audio.py
+    │   ├── play_audio.py
+    ├── Utils/
+    │   ├── audio_processing.py
+    │   ├── audio_seprator.py
+    │   ├── llm.py
+    │   ├── prompts.py
+    ├── Variable/
+    │   ├── audio_classes_dict.py
+    │   ├── configurations.py
+    │   ├── dataclases.py
+    │   ├── model_map.py
+    ├── Dockerfile
+    ├── .dockerignore
+    ├── .env
+    ├── .gitignore
+    ├── pyproject.toml
+    ├── .python-version
+    ├── requirements.txt
+    ├── run_server.sh
+    ├── server.py
+    ├── test_api.py
+    ├── uv.lock

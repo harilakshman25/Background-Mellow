@@ -1,0 +1,21 @@
+{
+  "storyPrompt": "\"He stepped into the dimly lit corridor as the heavy door creaked shut behind him. Footsteps echoed against the cold floor. Suddenly, a metallic click rang out, followed by a low hum vibrating through the walls. He froze, turning slowly as a silhouette emerged from the dark.\"",
+  "genre": "general",
+  "automatedMetrics": {
+    "clapScore": 0.20250120759010315,
+    "spectralRichness": 4.887989521026611,
+    "noiseFloor": -36.5013542175293,
+    "audioOnsets": 72,
+    "message": "Successfully evaluated audio"
+  },
+  "humanScores": {
+    "syncAccuracy": 4,
+    "semanticFit": 2,
+    "acousticQuality": 3,
+    "narrativeFlow": 2,
+    "cinematicImpact": 3
+  },
+  "finalScore": 5.6,
+  "feedback": "",
+  "createdAt": "2026-09-12T09:56:31.502Z"
+}

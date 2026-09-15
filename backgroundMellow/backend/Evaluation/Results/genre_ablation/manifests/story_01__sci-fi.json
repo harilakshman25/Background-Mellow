@@ -1,0 +1,17 @@
+{
+  "story_id": "story_01",
+  "story": "A person enters a quiet building, walks across a room, and notices a light turning on in the distance.",
+  "requested_genre": "sci-fi",
+  "total_duration_ms": 9500,
+  "cues": [
+    {
+      "id": 6,
+      "audio_type": "SFX",
+      "start_time_ms": 3000,
+      "duration_ms": 2000,
+      "audio_class": "footsteps running",
+      "weight_db": -6.0,
+      "fade_ms": 500
+    }
+  ]
+}

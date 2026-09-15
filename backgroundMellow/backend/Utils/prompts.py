@@ -360,13 +360,14 @@ JSON
 
 
 gemini_add_movie_bgms = PromptTemplate(
-    input_variables=["story_text", "speed_wps", "movie_bgms_csv", "already_added_audio_cues"],
+  input_variables=["story_text", "speed_wps", "genre", "movie_bgms_csv", "already_added_audio_cues"],
     template=(
         """
 You are a Master Music Supervisor and Lead Mixing Engineer for cinematic audio.
 
 Story: {story_text}
 Reading Speed: {speed_wps} words per second
+Genre: {genre}. Strongly prefer tracks whose `categories` column includes this genre (or a close synonym) over tracks that only match the story's general mood — genre match should outweigh mood match when both are available.
 
 Available Movie Background Music Database (CSV format):
 {movie_bgms_csv}

@@ -25,7 +25,7 @@ def movie_bgm_retriver(path: str, duration_ms: int):
     bgm_dir = os.path.join(backend_root, PATH_TO_MOVIE_BGMS)
     full_path = os.path.join(bgm_dir, path)
     
-    if(full_path[-4:] != ".mp3"):
+    if not os.path.splitext(full_path)[1]:
         full_path = full_path + ".mp3"
     audio_segment = AudioSegment.from_file(full_path)
     stretch_factor = duration_s / audio_segment.duration_seconds

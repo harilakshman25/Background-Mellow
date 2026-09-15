@@ -435,6 +435,7 @@ def query_gemini(
                 prompt_value = gemini_add_movie_bgms.format_prompt(
                     story_text=story_text,
                     speed_wps=speed_wps,
+                    genre=genre_label,
                     movie_bgms_csv=movie_bgms_csv,
                     already_added_audio_cues=audio_cues,
                 )

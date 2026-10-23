@@ -35,17 +35,25 @@ from model.word_aligner import WordAligner
 logger = logging.getLogger(__name__)
 
 MODEL_PATH = "model/dl_based_alignment_predictor.pth"
+GENRE_VOCAB = {
+    "general": 0,
+    "horror": 1,
+    "action": 2,
+    "sci-fi": 3,
+    "romance": 4,
+    "comedy": 5,
+}
 
 from helper.dl_conversions import denormalize_outputs
 class CinematicMixPredictor(nn.Module):
     """
-    Full-timeline cross-attention: tokens [Story, Class, Word_1, ..., Word_N].
+    Full-timeline cross-attention: tokens [Story, Class, Genre, Word_1, ..., Word_N].
     Class token attends over the whole narrative timeline; we take its output
     (+ residual class_emb) and predict [start_time, weight_db, duration].
     No rule-based BGM/SFX anchoring — the model learns when to place each sound.
     """
 
-    def __init__(self, embed_dim=384, n_heads=4, attention_dropout=0.1):
+    def __init__(self, embed_dim=384, n_heads=4, attention_dropout=0.1, load_checkpoint: bool = True):
         super(CinematicMixPredictor, self).__init__()
 
         self.embed_dim = embed_dim
@@ -60,6 +68,8 @@ class CinematicMixPredictor(nn.Module):
         self.story_ln = nn.LayerNorm(embed_dim)
         self.class_ln = nn.LayerNorm(embed_dim)
         self.timeline_ln = nn.LayerNorm(embed_dim)
+        self.genre_embedding = nn.Embedding(len(GENRE_VOCAB), embed_dim)
+        self.genre_ln = nn.LayerNorm(embed_dim)
 
         # Self-attention: class embedding, story embedding, and timeline (word) tokens attend to each other
         self.self_attn_1 = nn.MultiheadAttention(
@@ -87,7 +97,7 @@ class CinematicMixPredictor(nn.Module):
 
         # Load existing weights only if checkpoint exists. Filter by shape for compatibility
         # with older checkpoints (e.g. anchor_project vs timeline_project).
-        if os.path.exists(MODEL_PATH):
+        if load_checkpoint and os.path.exists(MODEL_PATH):
             try:
                 state = torch.load(MODEL_PATH, map_location=self.device, weights_only=True)
             except Exception:
@@ -108,6 +118,8 @@ class CinematicMixPredictor(nn.Module):
                     )
                 self.load_state_dict(filtered, strict=False)
                 logger.info("Loaded alignment predictor weights from %s", MODEL_PATH)
+        elif not load_checkpoint:
+            logger.info("Checkpoint loading disabled; using randomly initialized weights.")
         else:
             logger.info("No checkpoint at %s; using randomly initialized weights.", MODEL_PATH)
 
@@ -119,6 +131,7 @@ class CinematicMixPredictor(nn.Module):
         class_emb: torch.Tensor,
         timeline_seq: torch.Tensor,
         key_padding_mask: Optional[torch.Tensor] = None,
+        genre_id: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
         """
         Predict for a single audio cue (or batch of cues). Self-attention between
@@ -128,6 +141,7 @@ class CinematicMixPredictor(nn.Module):
         class_emb: [embed_dim] or [batch, embed_dim]
         timeline_seq: [seq_len, embed_dim + 3] or [batch, seq_len, embed_dim + 3]
         key_padding_mask: [seq_len] or [batch, seq_len] True = ignore. Optional.
+        genre_id: [batch] or scalar genre index. Defaults to the general genre.
         Returns: [3] or [batch, 3] (start_time, weight_db, duration) normalized in [-1, 1].
         """
         
@@ -139,22 +153,37 @@ class CinematicMixPredictor(nn.Module):
             if key_padding_mask is not None:
                 key_padding_mask = key_padding_mask.unsqueeze(0)
 
+        batch_size = story_emb.shape[0]
+        if genre_id is None:
+            genre_id = torch.zeros(batch_size, dtype=torch.long, device=story_emb.device)
+        else:
+            genre_id = genre_id.to(device=story_emb.device, dtype=torch.long)
+            if genre_id.dim() == 0:
+                genre_id = genre_id.reshape(1).expand(batch_size)
+            elif genre_id.dim() == 2 and genre_id.shape[-1] == 1:
+                genre_id = genre_id.squeeze(-1)
+            if genre_id.shape[0] != batch_size:
+                raise ValueError(
+                    f"genre_id batch size {genre_id.shape[0]} does not match embeddings batch size {batch_size}"
+                )
+
         # Project timeline: [B, T, embed_dim+3] -> [B, T, embed_dim]
         timeline_proj = self.timeline_project(timeline_seq)
         story_tok = self.story_ln(story_emb).unsqueeze(1)   # [B, 1, embed_dim]
         class_tok = self.class_ln(class_emb).unsqueeze(1)   # [B, 1, embed_dim]
+        genre_tok = self.genre_ln(self.genre_embedding(genre_id)).unsqueeze(1)
         timeline_proj = self.timeline_ln(timeline_proj)
 
-        # Sequence: [Story, Class, Word_1, ..., Word_N] — all attend to each other
-        tokens = torch.cat([story_tok, class_tok, timeline_proj], dim=1)  # [B, 2+T, embed_dim]
+        # Sequence: [Story, Class, Genre, Word_1, ..., Word_N]
+        tokens = torch.cat([story_tok, class_tok, genre_tok, timeline_proj], dim=1)  # [B, 3+T, embed_dim]
 
         if key_padding_mask is not None:
             pad_prefix = torch.zeros(
-                key_padding_mask.shape[0], 2, dtype=torch.bool, device=key_padding_mask.device
+                key_padding_mask.shape[0], 3, dtype=torch.bool, device=key_padding_mask.device
             )
             key_padding_mask = torch.cat([pad_prefix, key_padding_mask], dim=1)
 
-        # Block 1: self-attention (class, story, timeline tokens)
+        # Block 1: self-attention (class, story, genre, timeline tokens)
         attn_out, _ = self.self_attn_1(tokens, tokens, tokens, key_padding_mask=key_padding_mask)
         tokens = self.norm_1(tokens + attn_out)
 
@@ -189,22 +218,36 @@ class CinematicMixPredictor(nn.Module):
             epoch_loss_duration = 0.0
             num_batches = 0
             for batch_idx, batch in enumerate(dataloader):
-                (
-                    story_emb,
-                    class_emb,
-                    timeline_seq,
-                    key_padding_mask,
-                    targets,
-                ) = batch
+                if len(batch) == 6:
+                    (
+                        story_emb,
+                        class_emb,
+                        timeline_seq,
+                        key_padding_mask,
+                        genre_id,
+                        targets,
+                    ) = batch
+                else:
+                    # Compatibility with datasets created before genre conditioning.
+                    (
+                        story_emb,
+                        class_emb,
+                        timeline_seq,
+                        key_padding_mask,
+                        targets,
+                    ) = batch
+                    genre_id = None
                 story_emb = story_emb.to(self.device)
                 class_emb = class_emb.to(self.device)
                 timeline_seq = timeline_seq.to(self.device)
                 if key_padding_mask is not None:
                     key_padding_mask = key_padding_mask.to(self.device)
+                if genre_id is not None:
+                    genre_id = genre_id.to(self.device)
                 targets = targets.to(self.device)
 
                 optimizer.zero_grad()
-                outputs = self(story_emb, class_emb, timeline_seq, key_padding_mask)
+                outputs = self(story_emb, class_emb, timeline_seq, key_padding_mask, genre_id)
 
                 # Single combined loss: per-dimension MSE (one backward is correct)
                 loss_start = mse_fn(outputs[:, 0], targets[:, 0])
@@ -306,6 +349,7 @@ class CinematicMixPredictor(nn.Module):
         audio_classes: List[str],
         whisper_json: List[dict],
         scene_duration: float = 10.0,
+        genre: Optional[str] = None,
     ):
         """
         Takes the story and a list of sounds to generate parameters for.
@@ -314,6 +358,8 @@ class CinematicMixPredictor(nn.Module):
         """
         self.eval()
         results: List[Any] = []
+        genre_index = GENRE_VOCAB.get(genre, GENRE_VOCAB["general"]) if genre is not None else GENRE_VOCAB["general"]
+        genre_id = torch.tensor([genre_index], dtype=torch.long, device=self.device)
         timeline_seq = self.get_whisper_sequence_tensor(whisper_json, scene_duration)
         story_emb = self.embedder.encode(
             story_prompt,
@@ -328,7 +374,7 @@ class CinematicMixPredictor(nn.Module):
                     convert_to_tensor=True,
                     device=str(self.device),
                 )
-                output = self(story_emb, class_emb, timeline_seq)  # single cue, returns [3]
+                output = self(story_emb, class_emb, timeline_seq, genre_id=genre_id)  # single cue, returns [3]
                 s, w, d = output[0].item(), output[1].item(), output[2].item()
                 s_orig, w_orig, d_orig = denormalize_outputs(s, w, d)
                 results.append([s_orig, w_orig, d_orig])

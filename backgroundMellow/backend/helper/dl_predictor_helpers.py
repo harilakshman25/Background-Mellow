@@ -1,6 +1,10 @@
 import os
 import random
 import sys
+import argparse
+import csv
+import math
+import shutil
 # Add project root to path
 # import sys
 # import os
@@ -22,7 +26,7 @@ import random
 import pickle
 import torch
 from torch.utils.data import Dataset, DataLoader
-from model.dl_based_alignment_predictor import CinematicMixPredictor
+from model.dl_based_alignment_predictor import CinematicMixPredictor, GENRE_VOCAB
 from helper.audio_conversions import audio_to_base64
 from helper.lib import ParlerTTSModel
 import logging
@@ -34,8 +38,13 @@ from typing import List
 
 DATASET_PATH = "../data/yt_videos/generated_train_dataset.pkl"
 logger = logging.getLogger(__name__)
-YOUTUBE_DATASET_PATH = "./yt_dataset.jsonl"
+YOUTUBE_DATASET_PATH = "../data/yt_videos/yt_dataset_with_genre.jsonl"
 MODEL_PATH = "model/dl_based_alignment_predictor.pth"
+GENRE_MODEL_PATH = "model/dl_based_alignment_predictor_genre.pth"
+BASELINE_MODEL_PATH = "model/dl_based_alignment_predictor_baseline.pth"
+ORIGINAL_MODEL_PATH = "model/dl_based_alignment_predictor_original.pth"
+GENRE_VAL_LOSS_PATH = "genre_val_losses.csv"
+BASELINE_VAL_LOSS_PATH = "baseline_val_losses.csv"
 EMBEDDER_PATH = "model/embedder.pth"
 
 # Save the dataset to a file for reuse to avoid recalculation each time
@@ -82,7 +91,13 @@ def create_dataset():
                 logger.info(f"entry {idx+1} audio_class: {audio_cues['audio_class']} start_time_ms: {audio_cues['starting_time']/clip_duration_sec * narrator_end_time} duration_ms: {audio_cues['duration']/clip_duration_sec * narrator_end_time}")
             
             
-            dataset.append((story_prompt, audio_classes, narrator_audio_base64, clip_duration_sec))
+            dataset.append((
+                story_prompt,
+                audio_classes,
+                narrator_audio_base64,
+                clip_duration_sec,
+                data["genre"],
+            ))
 
             # Save dataset after each entry processed
             with open(DATASET_PATH, "wb") as dataset_file:
@@ -100,12 +115,44 @@ def load_dataset():
         return pickle.load(dataset_file)
 
 
+def make_genre_stratified_split(dataset, val_fraction=0.15, min_count_for_split=30):
+    """Split whole stories by genre, keeping small genres in the training set."""
+    stories_by_genre = {}
+    for item in dataset:
+        genre = item[4] if len(item) >= 5 else "general"
+        story_prompt = item[0]
+        stories_by_genre.setdefault(genre, {}).setdefault(story_prompt, []).append(item)
+
+    train_dataset = []
+    val_dataset = []
+    all_genres = sorted(stories_by_genre)
+    for genre in all_genres:
+        stories = list(stories_by_genre[genre].values())
+        random.shuffle(stories)
+        if len(stories) >= min_count_for_split:
+            val_count = min(max(1, math.ceil(len(stories) * val_fraction)), len(stories) - 1)
+            val_stories = stories[:val_count]
+            train_stories = stories[val_count:]
+        else:
+            train_stories = stories
+            val_stories = []
+        train_dataset.extend(item for story in train_stories for item in story)
+        val_dataset.extend(item for story in val_stories for item in story)
+        print(f"{genre}: train_count={len(train_stories)}, val_count={len(val_stories)}")
+
+    return train_dataset, val_dataset
+
+
 def _collate_timeline_batch(batch):
-    """Collate (story_emb, class_emb, timeline_seq, target) with padding for variable-length timeline."""
+    """Collate timeline samples with padding and optional genre IDs."""
     story_embs = torch.stack([b[0] for b in batch])
     class_embs = torch.stack([b[1] for b in batch])
     timeline_seqs = [b[2] for b in batch]
     targets = torch.stack([b[3] for b in batch])
+    genre_ids = torch.stack([
+        b[4] if len(b) > 4 else torch.tensor(GENRE_VOCAB["general"], dtype=torch.long)
+        for b in batch
+    ])
 
     max_T = max(seq.shape[0] for seq in timeline_seqs)
     embed_plus_3 = timeline_seqs[0].shape[1]
@@ -119,7 +166,7 @@ def _collate_timeline_batch(batch):
         padded[i, :T_i] = seq
         key_padding_mask[i, :T_i] = False
 
-    return story_embs, class_embs, padded, key_padding_mask, targets
+    return story_embs, class_embs, padded, key_padding_mask, genre_ids, targets
 
 
 class TimelineDataset(Dataset):
@@ -135,20 +182,20 @@ class TimelineDataset(Dataset):
         return self.samples[idx]
 
 
-def train_model(epochs=50, learning_rate=5e-4):
-    dataset = load_dataset()
-    logger.info("[train_model] Loaded dataset with %d entries", len(dataset))
-    model = CinematicMixPredictor()
-
+def _build_samples(dataset, model, force_genre_general=False):
     samples = []
     num_stories = len(dataset)
 
     for story_idx, item in enumerate(dataset):
         if len(item) == 4:
             story_prompt, audio_classes, narrator_audio_base64, scene_duration = item
+            genre = "general"
+        elif len(item) >= 5:
+            story_prompt, audio_classes, narrator_audio_base64, scene_duration, genre = item[:5]
         else:
             story_prompt, audio_classes, narrator_audio_base64 = item
             scene_duration = 10.0
+            genre = "general"
             logger.debug("[train_model] Entry has no clip_duration_sec; using default %.1fs", scene_duration)
 
         logger.info(
@@ -161,6 +208,10 @@ def train_model(epochs=50, learning_rate=5e-4):
         story_emb = model.embedder.encode(
             story_prompt, convert_to_tensor=True, device=str(model.device)
         )
+        genre_id = GENRE_VOCAB["general"] if force_genre_general else GENRE_VOCAB.get(
+            genre, GENRE_VOCAB["general"]
+        )
+        genre_id = torch.tensor(genre_id, dtype=torch.long, device=model.device)
 
         for cue in audio_classes:
             audio_class = cue["audio_class"]
@@ -171,53 +222,126 @@ def train_model(epochs=50, learning_rate=5e-4):
                 cue["start_time_ms"], cue["weight_db"], cue["duration_ms"],
             )
             y = torch.tensor([s_norm, w_norm, d_norm], dtype=torch.float32, device=model.device)
-            samples.append((story_emb, class_emb, timeline_seq, y))
+            samples.append((story_emb, class_emb, timeline_seq, y, genre_id))
+    return samples
 
-    train_dataset = TimelineDataset(samples)
+
+def _evaluate_by_genre(model, val_loader, genre):
+    model.eval()
+    losses = []
+    with torch.no_grad():
+        for batch in val_loader:
+            story_emb, class_emb, timeline_seq, key_padding_mask, genre_ids, targets = batch
+            outputs = model(
+                story_emb.to(model.device),
+                class_emb.to(model.device),
+                timeline_seq.to(model.device),
+                key_padding_mask.to(model.device),
+                genre_ids.to(model.device),
+            )
+            per_sample_loss = ((outputs - targets.to(model.device)) ** 2).sum(dim=1)
+            losses.extend(per_sample_loss.tolist())
+    return sum(losses) / len(losses) if losses else float("nan")
+
+
+def _train_with_validation(model, train_loader, val_loaders, epochs, learning_rate, csv_path):
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", factor=0.5, patience=5, min_lr=1e-5
+    )
+    losses = []
+    with open(csv_path, "w", newline="") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(["epoch", "genre", "val_loss", "sample_count"])
+        for epoch in range(epochs):
+            model.train()
+            epoch_loss = 0.0
+            batch_count = 0
+            for batch in train_loader:
+                story_emb, class_emb, timeline_seq, key_padding_mask, genre_ids, targets = batch
+                story_emb = story_emb.to(model.device)
+                class_emb = class_emb.to(model.device)
+                timeline_seq = timeline_seq.to(model.device)
+                key_padding_mask = key_padding_mask.to(model.device)
+                genre_ids = genre_ids.to(model.device)
+                targets = targets.to(model.device)
+                optimizer.zero_grad()
+                outputs = model(story_emb, class_emb, timeline_seq, key_padding_mask, genre_ids)
+                loss = torch.nn.functional.mse_loss(outputs, targets)
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+                optimizer.step()
+                epoch_loss += loss.item()
+                batch_count += 1
+            epoch_loss /= max(batch_count, 1)
+            losses.append(epoch_loss)
+            val_losses = {}
+            for genre, loader in val_loaders.items():
+                val_losses[genre] = _evaluate_by_genre(model, loader, genre)
+                writer.writerow([
+                    epoch + 1,
+                    genre,
+                    val_losses[genre],
+                    len(loader.dataset),
+                ])
+            scheduler.step(epoch_loss)
+            logger.info("Epoch %d/%d: train_loss=%.6f val_loss=%s", epoch + 1, epochs, epoch_loss, val_losses)
+    return losses
+
+
+def _backup_original_checkpoint():
+    if not os.path.exists(ORIGINAL_MODEL_PATH) and os.path.exists(MODEL_PATH):
+        shutil.copyfile(MODEL_PATH, ORIGINAL_MODEL_PATH)
+        logger.info("Backed up original checkpoint to %s", ORIGINAL_MODEL_PATH)
+
+
+def train_model(epochs=50, learning_rate=5e-4, force_genre_general=False, seed=42):
+    torch.manual_seed(seed)
+    random.seed(seed)
+    _backup_original_checkpoint()
+    dataset = load_dataset()
+    logger.info("[train_model] Loaded dataset with %d entries", len(dataset))
+    train_entries, val_entries = make_genre_stratified_split(dataset)
+    model = CinematicMixPredictor(load_checkpoint=False)
+    train_samples = _build_samples(train_entries, model, force_genre_general)
+
+    train_dataset = TimelineDataset(train_samples)
     train_loader = DataLoader(
         train_dataset, batch_size=8, shuffle=True, collate_fn=_collate_timeline_batch,
     )
-
-    logger.info("[train_model] Built dataset: N=%d samples (full timeline per sample)", len(samples))
-    if samples:
-        t_shape = samples[0][2].shape
-        logger.info("[train_model] Timeline shape per sample: %s (seq_len, embed_dim+3)", tuple(t_shape))
-        targets_stack = torch.stack([s[3] for s in samples])
-        logger.info(
-            "[train_model] Normalized target ranges (min/max): start=%s, weight_db=%s, duration=%s",
-            (targets_stack[:, 0].min().item(), targets_stack[:, 0].max().item()),
-            (targets_stack[:, 1].min().item(), targets_stack[:, 1].max().item()),
-            (targets_stack[:, 2].min().item(), targets_stack[:, 2].max().item()),
+    val_loaders = {}
+    for genre in sorted({item[4] for item in val_entries}):
+        genre_entries = [item for item in val_entries if item[4] == genre]
+        genre_samples = _build_samples(genre_entries, model, force_genre_general)
+        val_loaders[genre] = DataLoader(
+            TimelineDataset(genre_samples),
+            batch_size=8,
+            shuffle=False,
+            collate_fn=_collate_timeline_batch,
         )
-
-    logger.info("[train_model] Starting training for %d epochs, lr=%s", epochs, learning_rate)
-    losses = model.train_model(train_loader, epochs, learning_rate)
-    model.save_model(MODEL_PATH)
-    logger.info("Saved model to %s", MODEL_PATH)
-
-    plt.figure(figsize=(8, 6))
-    plt.plot(range(1, len(losses)+1), losses, marker='o')
-    plt.xlabel("Epoch")
-    plt.ylabel("Loss")
-    plt.title("Training Loss Curve")
-    plt.grid(True)
-    plt.show()
-    plt.tight_layout()
-    plt.savefig("loss_curve.png", bbox_inches="tight")
-    plt.close()
-    logger.info("Saved loss curve to loss_curve.png")
-
-    print("Model saved to", MODEL_PATH)
-    
+    output_path = BASELINE_MODEL_PATH if force_genre_general else GENRE_MODEL_PATH
+    csv_path = BASELINE_VAL_LOSS_PATH if force_genre_general else GENRE_VAL_LOSS_PATH
+    losses = _train_with_validation(model, train_loader, val_loaders, epochs, learning_rate, csv_path)
+    model.save_model(output_path)
+    logger.info("Saved model to %s", output_path)
+    return losses
 
 
-
-# train model
-create_dataset()
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--force-genre-general", action="store_true")
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--epochs", type=int, default=100)
+    parser.add_argument("--learning-rate", type=float, default=5e-4)
+    args = parser.parse_args()
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-    train_model(epochs=100, learning_rate=5e-4)
+    train_model(
+        epochs=args.epochs,
+        learning_rate=args.learning_rate,
+        force_genre_general=args.force_genre_general,
+        seed=args.seed,
+    )
     

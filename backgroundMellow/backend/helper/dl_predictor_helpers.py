@@ -3,8 +3,9 @@ import random
 import sys
 import argparse
 import csv
-import math
+import hashlib
 import shutil
+from collections import defaultdict, deque
 # Add project root to path
 # import sys
 # import os
@@ -37,14 +38,11 @@ from helper.dl_conversions import normalize_targets
 from typing import List
 
 DATASET_PATH = "../data/yt_videos/generated_train_dataset.pkl"
+WHISPER_CACHE_PATH = "../data/yt_videos/whisper_cache.json"
 logger = logging.getLogger(__name__)
 YOUTUBE_DATASET_PATH = "../data/yt_videos/yt_dataset_with_genre.jsonl"
 MODEL_PATH = "model/dl_based_alignment_predictor.pth"
-GENRE_MODEL_PATH = "model/dl_based_alignment_predictor_genre.pth"
-BASELINE_MODEL_PATH = "model/dl_based_alignment_predictor_baseline.pth"
 ORIGINAL_MODEL_PATH = "model/dl_based_alignment_predictor_original.pth"
-GENRE_VAL_LOSS_PATH = "genre_val_losses.csv"
-BASELINE_VAL_LOSS_PATH = "baseline_val_losses.csv"
 EMBEDDER_PATH = "model/embedder.pth"
 
 # Save the dataset to a file for reuse to avoid recalculation each time
@@ -97,6 +95,7 @@ def create_dataset():
                 narrator_audio_base64,
                 clip_duration_sec,
                 data["genre"],
+                data["video_title"],
             ))
 
             # Save dataset after each entry processed
@@ -115,30 +114,82 @@ def load_dataset():
         return pickle.load(dataset_file)
 
 
-def make_genre_stratified_split(dataset, val_fraction=0.15, min_count_for_split=30):
-    """Split whole stories by genre, keeping small genres in the training set."""
-    stories_by_genre = {}
+def attach_metadata_to_pickle():
+    with open(DATASET_PATH, "rb") as dataset_file:
+        dataset = pickle.load(dataset_file)
+
+    metadata_by_prompt = defaultdict(deque)
+    with open(YOUTUBE_DATASET_PATH, "r", encoding="utf-8") as metadata_file:
+        for line in metadata_file:
+            if line.strip():
+                row = json.loads(line)
+                metadata_by_prompt[row["story_prompt"]].append(
+                    (row["genre"], row["video_title"])
+                )
+
+    shutil.copyfile(DATASET_PATH, f"{DATASET_PATH}.bak")
+    updated_dataset = []
+    missing_count = 0
     for item in dataset:
-        genre = item[4] if len(item) >= 5 else "general"
-        story_prompt = item[0]
-        stories_by_genre.setdefault(genre, {}).setdefault(story_prompt, []).append(item)
+        story_prompt, audio_classes, narrator_audio_base64, clip_duration_sec = item[:4]
+        matches = metadata_by_prompt.get(story_prompt)
+        if not matches:
+            missing_count += 1
+            continue
+        genre, video_title = matches.popleft()
+        updated_dataset.append((
+            story_prompt,
+            audio_classes,
+            narrator_audio_base64,
+            clip_duration_sec,
+            genre,
+            video_title,
+        ))
+
+    with open(DATASET_PATH, "wb") as dataset_file:
+        pickle.dump(updated_dataset, dataset_file)
+    print(f"Dropped {missing_count} entries with no metadata match.")
+    return updated_dataset
+
+
+def make_genre_stratified_split(dataset, val_fraction=0.25, min_count_for_split=8):
+    """Split whole movies by genre, keeping oversized compilation movies in training."""
+    movies_by_genre = defaultdict(lambda: defaultdict(list))
+    for item in dataset:
+        genre = item[4]
+        movie = item[5].split("|")[0].strip()
+        movies_by_genre[genre][movie].append(item)
 
     train_dataset = []
     val_dataset = []
-    all_genres = sorted(stories_by_genre)
-    for genre in all_genres:
-        stories = list(stories_by_genre[genre].values())
-        random.shuffle(stories)
-        if len(stories) >= min_count_for_split:
-            val_count = min(max(1, math.ceil(len(stories) * val_fraction)), len(stories) - 1)
-            val_stories = stories[:val_count]
-            train_stories = stories[val_count:]
+    for genre in sorted(movies_by_genre):
+        eligible_movies = []
+        train_movies = []
+        for movie, clips in movies_by_genre[genre].items():
+            if len(clips) > 50:
+                train_movies.append((movie, clips))
+            else:
+                eligible_movies.append((movie, clips))
+
+        random.shuffle(eligible_movies)
+        if len(movies_by_genre[genre]) >= min_count_for_split and len(eligible_movies) >= 3:
+            val_count = min(
+                max(2, round(len(eligible_movies) * val_fraction)),
+                len(eligible_movies) - 1,
+            )
+            val_movies = eligible_movies[:val_count]
+            train_movies.extend(eligible_movies[val_count:])
         else:
-            train_stories = stories
-            val_stories = []
-        train_dataset.extend(item for story in train_stories for item in story)
-        val_dataset.extend(item for story in val_stories for item in story)
-        print(f"{genre}: train_count={len(train_stories)}, val_count={len(val_stories)}")
+            val_movies = []
+            train_movies.extend(eligible_movies)
+        train_dataset.extend(item for _, clips in train_movies for item in clips)
+        val_dataset.extend(item for _, clips in val_movies for item in clips)
+        print(
+            f"{genre}: train_movies={len(train_movies)}, "
+            f"val_movies={len(val_movies)}, "
+            f"train_clips={sum(len(clips) for _, clips in train_movies)}, "
+            f"val_clips={sum(len(clips) for _, clips in val_movies)}"
+        )
 
     return train_dataset, val_dataset
 
@@ -182,7 +233,7 @@ class TimelineDataset(Dataset):
         return self.samples[idx]
 
 
-def _build_samples(dataset, model, force_genre_general=False):
+def _build_samples(dataset, model, force_genre_general=False, whisper_cache=None):
     samples = []
     num_stories = len(dataset)
 
@@ -202,7 +253,12 @@ def _build_samples(dataset, model, force_genre_general=False):
             "[train_model] Building examples for story %d/%d (%d cues), scene_duration=%.1fs",
             story_idx + 1, num_stories, len(audio_classes), scene_duration,
         )
-        whisper_json = model.make_whisper_embedding(story_prompt, narrator_audio_base64)
+        cache_key = hashlib.md5(narrator_audio_base64.encode("utf-8")).hexdigest()
+        if cache_key in whisper_cache:
+            whisper_json = whisper_cache[cache_key]
+        else:
+            whisper_json = model.make_whisper_embedding(story_prompt, narrator_audio_base64)
+            whisper_cache[cache_key] = whisper_json
         timeline_seq = model.get_whisper_sequence_tensor(whisper_json or [], scene_duration)
 
         story_emb = model.embedder.encode(
@@ -226,7 +282,7 @@ def _build_samples(dataset, model, force_genre_general=False):
     return samples
 
 
-def _evaluate_by_genre(model, val_loader, genre):
+def _evaluate_by_genre(model, val_loader):
     model.eval()
     losses = []
     with torch.no_grad():
@@ -239,9 +295,21 @@ def _evaluate_by_genre(model, val_loader, genre):
                 key_padding_mask.to(model.device),
                 genre_ids.to(model.device),
             )
-            per_sample_loss = ((outputs - targets.to(model.device)) ** 2).sum(dim=1)
-            losses.extend(per_sample_loss.tolist())
-    return sum(losses) / len(losses) if losses else float("nan")
+            losses.append((outputs - targets.to(model.device)) ** 2)
+    if not losses:
+        return {
+            "total": float("nan"),
+            "start": float("nan"),
+            "weight_db": float("nan"),
+            "duration": float("nan"),
+        }
+    mean_squared_error = torch.cat(losses).mean(dim=0).tolist()
+    return {
+        "start": mean_squared_error[0],
+        "weight_db": mean_squared_error[1],
+        "duration": mean_squared_error[2],
+        "total": sum(mean_squared_error) / 3,
+    }
 
 
 def _train_with_validation(model, train_loader, val_loaders, epochs, learning_rate, csv_path):
@@ -252,7 +320,10 @@ def _train_with_validation(model, train_loader, val_loaders, epochs, learning_ra
     losses = []
     with open(csv_path, "w", newline="") as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(["epoch", "genre", "val_loss", "sample_count"])
+        writer.writerow([
+            "epoch", "genre", "val_total", "val_start", "val_weight_db",
+            "val_duration", "sample_count",
+        ])
         for epoch in range(epochs):
             model.train()
             epoch_loss = 0.0
@@ -277,11 +348,14 @@ def _train_with_validation(model, train_loader, val_loaders, epochs, learning_ra
             losses.append(epoch_loss)
             val_losses = {}
             for genre, loader in val_loaders.items():
-                val_losses[genre] = _evaluate_by_genre(model, loader, genre)
+                val_losses[genre] = _evaluate_by_genre(model, loader)
                 writer.writerow([
                     epoch + 1,
                     genre,
-                    val_losses[genre],
+                    val_losses[genre]["total"],
+                    val_losses[genre]["start"],
+                    val_losses[genre]["weight_db"],
+                    val_losses[genre]["duration"],
                     len(loader.dataset),
                 ])
             scheduler.step(epoch_loss)
@@ -300,10 +374,15 @@ def train_model(epochs=50, learning_rate=5e-4, force_genre_general=False, seed=4
     random.seed(seed)
     _backup_original_checkpoint()
     dataset = load_dataset()
+    if os.path.exists(WHISPER_CACHE_PATH):
+        with open(WHISPER_CACHE_PATH, "r", encoding="utf-8") as cache_file:
+            whisper_cache = json.load(cache_file)
+    else:
+        whisper_cache = {}
     logger.info("[train_model] Loaded dataset with %d entries", len(dataset))
     train_entries, val_entries = make_genre_stratified_split(dataset)
     model = CinematicMixPredictor(load_checkpoint=False)
-    train_samples = _build_samples(train_entries, model, force_genre_general)
+    train_samples = _build_samples(train_entries, model, force_genre_general, whisper_cache)
 
     train_dataset = TimelineDataset(train_samples)
     train_loader = DataLoader(
@@ -312,15 +391,19 @@ def train_model(epochs=50, learning_rate=5e-4, force_genre_general=False, seed=4
     val_loaders = {}
     for genre in sorted({item[4] for item in val_entries}):
         genre_entries = [item for item in val_entries if item[4] == genre]
-        genre_samples = _build_samples(genre_entries, model, force_genre_general)
+        genre_samples = _build_samples(genre_entries, model, force_genre_general, whisper_cache)
         val_loaders[genre] = DataLoader(
             TimelineDataset(genre_samples),
             batch_size=8,
             shuffle=False,
             collate_fn=_collate_timeline_batch,
         )
-    output_path = BASELINE_MODEL_PATH if force_genre_general else GENRE_MODEL_PATH
-    csv_path = BASELINE_VAL_LOSS_PATH if force_genre_general else GENRE_VAL_LOSS_PATH
+    with open(WHISPER_CACHE_PATH, "w", encoding="utf-8") as cache_file:
+        json.dump(whisper_cache, cache_file)
+    arm = "baseline" if force_genre_general else "genre"
+    output_path = f"model/dl_based_alignment_predictor_{arm}_seed{seed}.pth"
+    csv_path = f"{arm}_val_losses_seed{seed}.csv"
+    torch.manual_seed(seed)
     losses = _train_with_validation(model, train_loader, val_loaders, epochs, learning_rate, csv_path)
     model.save_model(output_path)
     logger.info("Saved model to %s", output_path)
@@ -329,11 +412,15 @@ def train_model(epochs=50, learning_rate=5e-4, force_genre_general=False, seed=4
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--attach-metadata", action="store_true")
     parser.add_argument("--force-genre-general", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--learning-rate", type=float, default=5e-4)
     args = parser.parse_args()
+    if args.attach_metadata:
+        attach_metadata_to_pickle()
+        raise SystemExit(0)
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
